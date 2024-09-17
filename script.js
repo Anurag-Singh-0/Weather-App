@@ -6,37 +6,46 @@ let userInput = document.querySelector(".search input");
 let searchBox = document.querySelector(".search button");
 let icon = document.querySelector(".icon i");
 
-let KEY = "927986a68c5945fdb80131140241509";
-let URL = "http://api.weatherapi.com/v1/current.json";
+let KEY = "N4X5YWV8EDM68G9RM5LB6S9DS";
+let URL =
+  "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline";
 
+// Function to fetch weather data
 let getWeatherData = async () => {
-  let city = userInput.value.trim();
+  let city = userInput.value.trim(); // Get the user input
 
+  // If city name is empty, alert the user
   if (city === "") {
-    alert("Pleace enter a city name!");
+    alert("Please enter a city name!");
     return;
   }
 
   try {
-    let response = await fetch(`${URL}?key=${KEY}&q=${city}&units=metric`);
+    let response = await fetch(
+      `${URL}/${city}/today?unitGroup=metric&key=${KEY}&contentType=json`
+    );
+
     let result = await response.json();
-    console.log(response);
+    console.log(result);
 
-    cityElement.textContent = `${result.location.name}`;
-    temp.textContent = `${result.current.temp_c}°C`;
-    wind.textContent = `${result.current.wind_kph} kph`;
-    humidity.textContent = `${result.current.humidity} %`;
+    cityElement.textContent = `${result.address}`;
+    temp.textContent = `${result.days[0].temp}°C`;
+    wind.textContent = `${result.days[0].windspeed} kph`;
+    humidity.textContent = `${result.days[0].humidity} %`;
 
-    let condition = result.current.condition.text.toLowerCase();
+    let condition = result.days[0].conditions.toLowerCase();
     updateWeatheIcon(condition);
 
-    userInput.value = "";
+    userInput.value = ""; // Clear input box
   } catch (error) {
     console.error("Error fetching weather data:", error);
-    alert("Unable to fetch data for the entered city. Please check the city name and try again.");
+    alert(
+      "Unable to fetch data for the entered city. Please check the city name and try again."
+    );
   }
 };
 
+// Function to update weather icon
 let updateWeatheIcon = (condition) => {
   if (condition.includes("cloud")) {
     icon.className = "fa-solid fa-cloud";
